@@ -1,6 +1,22 @@
 {
   "extends": "airbnb",
   "plugins": [
-    "react"
-  ]
+    "react",
+    "react-native",
+  ],
+  "parserOptions":{
+    "ecmaFeatures": {
+      "jsx": true,
+      "experimentalObjectRestSpread": true,
+    }
+  },
+  "rules": {
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/prop-types": 0,
+    "global-require": 0,
+    "no-underscore-dangle": [2, { "allow": ["_id"] }],
+  },
+  "globals": {
+    "fetch": true,
+  }
 }
