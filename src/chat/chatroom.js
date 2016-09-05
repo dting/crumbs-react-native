@@ -7,18 +7,14 @@ import {
   ScrollView,
   TouchableHighlight,
   Alert,
-  AsyncStorage,
 } from 'react-native';
 import moment from 'moment';
+import store from 'react-native-simple-store';
 import styles from './chatroom.styles';
 import imgUrlDefault from './profileIcon.png';
 
 // TODO: Make repeat functions with map.js more DRY
 // TODO: Update all socket messages to reflect changes to server (TBD)
-
-/* eslint-disable no-console */
-const log = (...args) => console.log(...args);
-/* eslint-enable no-console */
 
 export default class Chatroom extends Component {
   constructor(props) {
@@ -37,7 +33,6 @@ export default class Chatroom extends Component {
     });
 
     this.props.socket.on('message:added', result => {
-      log('message added');
       const messageList = this.state.messageList;
       messageList.push(result.message);
       this.setState({ messageList });
@@ -48,20 +43,19 @@ export default class Chatroom extends Component {
     this.onBackPress = this.onBackPress.bind(this);
     this.onLogoutPress = this.onLogoutPress.bind(this);
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const loc = this.createChatRoomId(position.coords);
-        this.setState({ location: loc });
-        AsyncStorage.getItem(this.props.storage_key)
-          .then(username => {
-            this.state.username = username;
-            this.props.socket.emit('join:room', {
-              location: this.state.location,
-              username: this.state.username,
-            });
-            this.listenForGeoChange();
+    navigator.geolocation.getCurrentPosition(position => {
+      const loc = this.createChatRoomId(position.coords);
+      this.setState({ location: loc });
+      store.get(this.props.storage_key)
+        .then(username => {
+          this.state.username = username;
+          this.props.socket.emit('join:room', {
+            location: this.state.location,
+            username: this.state.username,
           });
-      });
+          this.listenForGeoChange();
+        });
+    });
   }
 
   componentWillUnmount() {
@@ -85,9 +79,7 @@ export default class Chatroom extends Component {
 
   onLogoutPress() {
     this.myUnmount();
-    this.props.navigator.push({
-      name: 'login',
-    });
+    this.props.navigator.push({ name: 'login' });
   }
 
   myUnmount() {
@@ -100,9 +92,6 @@ export default class Chatroom extends Component {
     this.watchID = navigator.geolocation.watchPosition(position => {
       const coordStr = this.createChatRoomId(position.coords);
       if (coordStr !== this.state.location) {
-        log('location changed, return to map');
-        log(' state:', this.state.location);
-        log('   new:', coordStr);
         this.onBackPress();
       }
     });
@@ -115,7 +104,6 @@ export default class Chatroom extends Component {
   }
 
   emitAddMessageToChatRoom() {
-    log(this.state.message);
     this.props.socket.emit('add:message', {
       location: this.state.location,
       message: this.state.message,
@@ -144,8 +132,7 @@ export default class Chatroom extends Component {
           <Text style={styles.memberLabel}>{moment(item.createdAt).fromNow()}</Text>
         </View>
       </View>
-      )
-    );
+    ));
 
     list.reverse(); // display most recent messages first
 
@@ -166,13 +153,13 @@ export default class Chatroom extends Component {
               style={styles.touchable}
               underlayColor={'#dcf4ff'}
               onPress={() => Alert.alert(
-                  'LOGOUT',
-                    'Exit chatroom and return to login page?',
+                'LOGOUT',
+                'Exit chatroom and return to login page?',
                 [
-                  { text: 'CANCEL', onPress: () => log('cancel pressed') },
+                  { text: 'CANCEL', onPress: () => {} },
                   { text: 'OK', onPress: this.onLogoutPress },
                 ]
-                  )}
+              )}
             >
               <Text>Logout &gt;</Text>
             </TouchableHighlight>
@@ -182,7 +169,7 @@ export default class Chatroom extends Component {
           <ScrollView
             scrollEventThrottle={16}
           >
-          {list}
+            {list}
           </ScrollView>
         </View>
         <View style={styles.inputContainer}>

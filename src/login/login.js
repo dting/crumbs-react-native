@@ -6,24 +6,29 @@ import {
   TouchableHighlight,
   Alert,
   Image,
-  AsyncStorage,
 } from 'react-native';
 import Hyperlink from 'react-native-hyperlink';
+import store from 'react-native-simple-store';
 import styles from './login.styles';
 
 export default class Login extends Component {
   constructor(props) {
     super(props);
-    this.state = { username: '', password: '' };
+
+    this.state = {
+      username: '',
+      password: '',
+    };
+
     this.props.socket.on('Authentication', username => {
       if (username) {
-        try {
-          AsyncStorage.setItem(this.props.storage_key, username).then(() => {
+        store.save(this.props.storage_key, username)
+          .then(() => {
             this.props.navigator.push({ name: 'map' });
+          })
+          .catch((/* err */) => {
+            // console.log(`AsyncStorage Error - ${err}`);
           });
-        } catch (err) {
-          // console.log(`AsyncStorage Error - ${err}`);
-        }
       } else {
         this.setState({ password: '' });
         Alert.alert(
@@ -31,6 +36,7 @@ export default class Login extends Component {
           'Please try again. If you are a new user, please create a profile.');
       }
     });
+
     this.validateUser = this.validateUser.bind(this);
     this.onLinkPress = this.onLinkPress.bind(this);
   }
