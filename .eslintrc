@@ -18,5 +18,7 @@
   },
   "globals": {
     "fetch": true,
+    "navigator": true,
+    "window": true,
   }
 }

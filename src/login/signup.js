@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
   Text,
   View,
-  StyleSheet,
   TextInput,
   TouchableHighlight,
   Alert,
@@ -16,36 +15,33 @@ export default class Signup extends Component {
   constructor(props) {
     super(props);
     this.state = { username: '', password: '' };
-    this.props.socket.on('Authentication', username => { 
+    this.props.socket.on('Authentication', username => {
       if (username) {
         try {
-          AsyncStorage.setItem(this.props.storage_key, username).then(message => {
-            AsyncStorage.getItem(this.props.storage_key).then(result => {
-              console.log('successfully set username to: ' +  result);
-              this.props.navigator.push({
-                name: 'map',
-              });
-            })  
+          AsyncStorage.setItem(this.props.storage_key, username).then(() => {
+            this.props.navigator.push({ name: 'map' });
           });
-        } catch (error) {
-          console.log('there was an error' + error);
+        } catch (err) {
+          // console.log(`AsyncStorage Error - ${err}`);
         }
       } else {
         this.setState({ password: '' });
-        Alert.alert('Incorrect Username or Password', 'Please try again. If you are already a member, please login.');
+        Alert.alert(
+          'Incorrect Username or Password',
+          'Please try again. If you are already a member, please login.');
       }
     });
+    this.validateUser = this.validateUser.bind(this);
+    this.onLinkPress = this.onLinkPress.bind(this);
   }
 
   onLinkPress() {
     this.props.socket.off('Authentication');
-    this.props.navigator.push({
-      name: 'login',
-    });
+    this.props.navigator.push({ name: 'login' });
   }
 
   validateUser() {
-    this.props.socket.emit('user:signUp', { 
+    this.props.socket.emit('user:signUp', {
       username: this.state.username,
       password: this.state.password,
     });
@@ -55,7 +51,7 @@ export default class Signup extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.loginContainer}>
-          <Image source={require("./cookie.jpg")} />
+          <Image source={require('./cookie.jpg')} />
           <Text style={styles.header}> Crumbs </Text>
           <Text style={styles.subheader}> Create a Profile </Text>
           <TextInput
@@ -68,7 +64,7 @@ export default class Signup extends Component {
           />
           <TextInput
             style={styles.input}
-            secureTextEntry={true}
+            secureTextEntry
             value={this.state.password}
             onChangeText={(text) => this.setState({ password: text })}
             placeholder={'Enter Password'}
@@ -85,7 +81,10 @@ export default class Signup extends Component {
           <Hyperlink>
             <View>
               <Text style={{ fontSize: 15 }}>
-                Already a member? <Text onPress={() => this.onLinkPress()} style={{color: 'blue', fontSize:15}}>Login</Text>
+                Already a member?
+                <Text onPress={this.onLinkPress} style={{ color: 'blue', fontSize: 15 }}>
+                  Login
+                </Text>
               </Text>
             </View>
           </Hyperlink>
@@ -95,4 +94,3 @@ export default class Signup extends Component {
   }
 
 }
-

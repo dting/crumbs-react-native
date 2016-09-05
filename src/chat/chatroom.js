@@ -9,9 +9,9 @@ import {
   Alert,
   AsyncStorage,
 } from 'react-native';
+import moment from 'moment';
 import styles from './chatroom.styles';
 import imgUrlDefault from './profileIcon.png';
-import moment from 'moment';
 
 // TODO: Make repeat functions with map.js more DRY
 // TODO: Update all socket messages to reflect changes to server (TBD)
