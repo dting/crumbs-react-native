@@ -7,6 +7,11 @@ module.exports = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#87CEEB',
   },
+  navContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#F5FCFF',
+  },
   loginContainer: {
     flex: 1,
     justifyContent: 'center',
